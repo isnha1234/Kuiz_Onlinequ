@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuis Online</title>
+  <style>
+    #welcome {
+  text-align: center;
+}
+
+.navbar {
+  background-color: none;
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 960px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  font-size: 1.4em;
+  font-weight: 600;
+  color: #333;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  font-size: 0.95em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: #0056b3;
+}
+    body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #f0f4f8, #dfefff);
+    padding: 20px;
+    margin: 0;
+}
+
+.quiz-container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  border-radius: 12px;
+  padding: 25px 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+h2, .question {
+  font-weight: 600;
+  color: #333;
+}
+
+.answer-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.answer-btn {
+  background: #4285f4;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+.answer-btn:hover {
+  background: #2a65c3;
+}
+
+.next-btn {
+  margin-top: 25px;
+  padding: 12px 24px;
+  font-size: 1em;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.next-btn:hover {
+  background: #218838;
+}
+
+#reset-btn {
+  background-color: #dc3545;
+}
+#reset-btn:hover {
+  background-color: #bd2130;
+}
+
+.timer {
+  font-size: 1em;
+  text-align: right;
+  margin-bottom: 10px;
+  color: #d9534f;
+}
+
+input#username {
+  padding: 12px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+.score, .last-score {
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.score-history ul {
+  padding-left: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  .quiz-container {
+    padding: 20px;
+    width: 90%;
+  }
+
+  .answer-btn, .next-btn, #reset-btn {
+    font-size: 0.95em;
+    padding: 10px;
+  }
+
+  input#username {
+    font-size: 1em;
+  }
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 25px 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 1.4em;
+  cursor: pointer;
+  color: #999;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+
+  </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+          <div class="navbar-logo">🧠 Kuis Online</div>
+          <div class="navbar-links">
+            <button class="nav-btn" onclick="openModal('register-modal')">Daftar</button>
+            <button class="nav-btn" onclick="openModal('login-modal')">Login</button>
+
+          </div>
+        </div>
+      </nav>
+      
+    <div class="quiz-container" id="welcome">
+        <h2>Selamat datang di Kuis Saya!</h2>
+        <p>Silakan masukkan nama Anda untuk memulai.</p>
+        <input type="text" id="username" placeholder="Nama Anda" style="padding: 10px; width: 80%; margin-bottom: 10px;" />
+        <br>
+        <button class="next-btn" id="start-btn">Lanjutkan</button>
+      </div>
+      
+      
+  <div class="quiz-container" id="quiz" style="display: none;">
+    <div class="timer" id="timer">Waktu: 15 detik</div>
+    <div class="question" id="question">Pertanyaan akan muncul di sini</div>
+    <div class="answer-buttons" id="answer-buttons"></div>
+    <button class="next-btn" id="next-btn">Selanjutnya</button>
+    <div class="score" id="score"></div>
+    <div class="last-score" id="last-score"></div>
+  </div>
+
+  <!-- Modal Login -->
+<div class="modal" id="login-modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
+      <h2>Login</h2>
+      <input type="text" placeholder="Username" class="modal-input" />
+      <input type="password" placeholder="Password" class="modal-input" />
+      <button class="next-btn" onclick="validateLogin()">Masuk</button>
+
+    </div>
+  </div>
+  
+  <!-- Modal Daftar -->
+  <div class="modal" id="register-modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('register-modal')">&times;</span>
+      <h2>Daftar</h2>
+      <input type="text" placeholder="Nama Lengkap" class="modal-input" />
+      <input type="text" placeholder="Username" class="modal-input" />
+      <input type="password" placeholder="Password" class="modal-input" />
+      <button class="next-btn" onclick="validateRegister()">Daftar</button>
+
+    </div>
+  </div>  
+  
+  <script>
+    let userName = "";
+
+    const questions = [
+      {
+        question: "Apa ibu kota Indonesia?",
+        answers: [
+          { text: "Jakarta", correct: true },
+          { text: "Bandung", correct: false },
+          { text: "Surabaya", correct: false },
+          { text: "Medan", correct: false },
+        ],
+      },
+      {
+        question: "Berapa hasil dari 5 + 3?",
+        answers: [
+          { text: "8", correct: true },
+          { text: "9", correct: false },
+          { text: "10", correct: false },
+          { text: "7", correct: false },
+        ],
+      },
+      {
+        question: "Siapa penemu lampu pijar?",
+        answers: [
+          { text: "Thomas Edison", correct: true },
+          { text: "Albert Einstein", correct: false },
+          { text: "Isaac Newton", correct: false },
+          { text: "Galileo Galilei", correct: false },
+        ],
+      }
+    ];
+
+    const questionEl = document.getElementById("question");
+    const answerButtonsEl = document.getElementById("answer-buttons");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const lastScoreEl = document.getElementById("last-score");
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeLeft = 15;
+    let timerInterval;
+
+    const welcomeScreen = document.getElementById("welcome");
+const quizScreen = document.getElementById("quiz");
+const startBtn = document.getElementById("start-btn");
+
+startBtn.addEventListener("click", () => {
+  const nameInput = document.getElementById("username");
+  const nameValue = nameInput.value.trim();
+
+  if (nameValue === "") {
+    alert("Silakan isi nama terlebih dahulu.");
+    return;
+  }
+
+  userName = nameValue;
+  welcomeScreen.style.display = "none";
+  quizScreen.style.display = "block";
+  startQuiz();
+});
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      nextBtn.innerHTML = "Selanjutnya";
+      scoreEl.innerHTML = "";
+      loadLastScore();
+      showQuestion();
+    }
+
+    function loadLastScore() {
+    const last = localStorage.getItem("lastScore");
+    if (last !== null) {
+    const { name, score } = JSON.parse(last);
+    lastScoreEl.innerText = `Skor terakhir: ${name} - ${score} poin`;
+  } else {
+    lastScoreEl.innerText = "";
+  }
+}
+
+
+    function showQuestion() {
+      resetState();
+      startTimer();
+
+      let currentQuestion = questions[currentQuestionIndex];
+      questionEl.innerText = currentQuestion.question;
+
+      currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerText = answer.text;
+        button.classList.add("answer-btn");
+        if (answer.correct) {
+          button.dataset.correct = answer.correct;
+        }
+        button.addEventListener("click", selectAnswer);
+        answerButtonsEl.appendChild(button);
+      });
+    }
+
+    function resetState() {
+      clearInterval(timerInterval);
+      timeLeft = 15;
+      timerEl.innerText = `Waktu: ${timeLeft} detik`;
+      nextBtn.style.display = "none";
+      answerButtonsEl.innerHTML = "";
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.innerText = `Waktu: ${timeLeft} detik`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          handleNoAnswer();
+        }
+      }, 1000);
+    }
+
+    function selectAnswer(e) {
+      clearInterval(timerInterval);
+      const selectedBtn = e.target;
+      const isCorrect = selectedBtn.dataset.correct === "true";
+        // Ambil elemen audio
+  const soundBenar = document.getElementById("soundBenar");
+  const soundSalah = document.getElementById("soundSalah");
+
+      if (isCorrect) {
+        selectedBtn.style.background = "green";
+        score++;
+        soundBenar.play(); // 🔊 mainkan suara benar
+      } else {
+        selectedBtn.style.background = "red";
+        soundSalah.play(); // 🔊 mainkan suara salah
+      }
+
+      Array.from(answerButtonsEl.children).forEach(button => {
+        button.disabled = true;
+        if (button.dataset.correct === "true") {
+          button.style.background = "green";
+        }
+      });
+
+      nextBtn.style.display = "inline-block";
+    }
+
+    function handleNoAnswer() {
+      // Disable all buttons and show correct
+      Array.from(answerButtonsEl.children).forEach(button => {
+        button.disabled = true;
+        if (button.dataset.correct === "true") {
+          button.style.background = "green";
+        } else {
+          button.style.background = "lightgray";
+        }
+      });
+      nextBtn.style.display = "inline-block";
+    }
+
+    function showScore() {
+  clearInterval(timerInterval);
+  resetState();
+  questionEl.innerHTML = `Kuis Selesai, ${userName}!`;
+  scoreEl.innerHTML = `Skor Anda: ${score} dari ${questions.length}`;
+
+  localStorage.setItem("lastScore", JSON.stringify({ name: userName, score: score }));
+  nextBtn.innerHTML = "Main Lagi";
+  nextBtn.style.display = "inline-block";
+}
+
+
+    function handleNextButton() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showScore();
+      }
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (currentQuestionIndex < questions.length) {
+        handleNextButton();
+      } else {
+        startQuiz();
+      }
+    });
+
+    startQuiz();
+
+    function openModal(id) {
+  document.getElementById(id).style.display = "block";
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = "none";
+}
+
+// Tutup modal saat klik di luar konten
+window.onclick = function(event) {
+  const modals = ['login-modal', 'register-modal'];
+  modals.forEach(id => {
+    const modal = document.getElementById(id);
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+};
+
+function validateLogin() {
+  const inputs = document.querySelectorAll('#login-modal .modal-input');
+  const username = inputs[0].value.trim();
+  const password = inputs[1].value.trim();
+
+  if (!username || !password) {
+    alert("Mohon isi username dan password.");
+    return;
+  }
+
+  alert("Login berhasil (simulasi).");
+  closeModal('login-modal');
+}
+
+function validateRegister() {
+  const inputs = document.querySelectorAll('#register-modal .modal-input');
+  const name = inputs[0].value.trim();
+  const username = inputs[1].value.trim();
+  const password = inputs[2].value.trim();
+
+  if (!name || !username || !password) {
+    alert("Semua kolom wajib diisi.");
+    return;
+  }
+
+  alert("Pendaftaran berhasil (simulasi).");
+  closeModal('register-modal');
+}
+
+function validateRegister() {
+  const inputs = document.querySelectorAll('#register-modal .modal-input');
+  const name = inputs[0].value.trim();
+  const username = inputs[1].value.trim();
+  const password = inputs[2].value.trim();
+
+  if (!name || !username || !password) {
+    alert("Semua kolom wajib diisi.");
+    return;
+  }
+
+  alert("Pendaftaran berhasil (simulasi).");
+  closeModal('register-modal');
+}
+
+
+  </script>
+  <!-- Tambahan di bagian <body> paling bawah sebelum </body> -->
+<audio id="soundBenar" src="https://www.myinstants.com/media/sounds/correct-answer.mp3"></audio>
+<audio id="soundSalah" src="https://www.myinstants.com/media/sounds/wrong-answer.mp3"></audio>
+
+</body>
+</html>
